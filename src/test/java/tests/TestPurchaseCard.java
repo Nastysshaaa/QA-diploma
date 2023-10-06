@@ -134,5 +134,60 @@ public class TestPurchaseCard {
         paymentPage.clickContinueButton();
         $(byText ("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
     }
-        
+       @Test
+    void shouldCheckPastYearByCard() {  //проверка срока действия карты, прошлого года
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(approvedCardNumber);
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(pastYear);
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCvcField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        $(byText ("Истёк срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
+
+    }
+        @Test
+    void shouldCheckFalseMonthCard() {  //проверка  неверно заполненного поля "месяц"
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(approvedCardNumber);
+        paymentPage.fillMonthField(falseMonth);
+        paymentPage.fillYearField(DataHelper.getYear(0));
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCvcField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        $(byText ("Неверно указан срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
+    }
+     @Test
+    void shouldCheckInvalidHolderCard() {  //проверка неверно заполненного поля "владелец"
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(approvedCardNumber);
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(DataHelper.getYear(0));
+        paymentPage.fillHolderField(invalidName);
+        paymentPage.fillCvcField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveErrorNotificationWrongFormat();
+        assertNull(SQLRequests.getStatusByCard());
+    }
+    @Test
+    void shouldCheckInvalidCvsByCard() { //проверка неверно заполненного поля "cvv"
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(approvedCardNumber);
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(DataHelper.getYear(0));
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCVVField(invalidCVV);
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveErrorNotificationWrongFormat();
+        assertNull(SQLRequests.getStatusByCard());
+    }
+
+    private void stayAllFieldsEmpty() {  //оставить все поля пустыми
+        paymentPage.fillCardNumberField(emptyCard);
+        paymentPage.fillMonthField(emptyMonth);
+        paymentPage.fillYearField(emptyYear);
+        paymentPage.fillHolderField(emptyName);
+        paymentPage.fillCvcField(emptyCVV);
+        paymentPage.clickContinueButton();
+    }
 }
