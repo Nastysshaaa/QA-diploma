@@ -111,6 +111,28 @@ public class TestPurchaseCard {
         paymentPage.shouldHaveErrorNotification();
         assertNull(SQLRequests.getStatusByCard());
     }
-        
+         
+    @Test
+    void shouldCheckInvalidMonthCard() { //проверка неверного значения по месяцу карты
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(approvedCardNumber);
+        paymentPage.fillMonthField(invalidMonth);
+        paymentPage.fillYearField(DataHelper.getYear());
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCvcField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        $(byText ("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
+    }
+    @Test
+    void shouldCheckInvalidYearCard() { //проверка неверного значения по году действия карты
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(approvedCardNumber);
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(invalidYear);
+        paymentPage.fillHolderField(DataHepler.getRandomValidName());
+        paymentPage.fillCvcField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        $(byText ("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
+    }
         
 }
