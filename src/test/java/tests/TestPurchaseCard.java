@@ -52,4 +52,52 @@ public class TestPurchaseCard {
 
         assertEquals("APPROVED", SQLRequests.getStatusByCard());
     }
+    @Test 
+    void shouldCheckValidDeclinedByCard() { //проверка отклненной карты 
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(declinedCardNumber);
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(DataHelper.getYear(0));
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCvcField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveErrorNotification();
+
+        assertEquals("DECLINED", SQLRequests.getStatusByCard());
+    }
+   
+    @Test
+    void shouldCheckEmptyByCard() {  //проверка пустого поля карты
+        paymentPage.openCardPaymentPage();
+        stayAllFieldsEmpty();
+        $(byText ("Поле обязательно для заполнения")).shouldBe(visible, Duration.ofSeconds(30));
+    }
+    
+    @Test
+    void shouldCheckInvalidByCard() {  //проверка неверной карты
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(getRandomCard());
+        paymentPage.fillCardNumberField(declinedCardNumber);
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(DataHelper.getYear(0));
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCvcField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveErrorNotification();
+
+        assertNull(SQLRequests.getStatusByCard());
+    }
+    @Test
+    void shouldCheckZeroValuesByCard() { //проверка нулевых значений по карте
+        paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(zeroCard);
+        paymentPage.fillMonthField(zeroMonth);
+        paymentPage.fillYearField(zeroYear);
+        paymentPage.fillHolderField(zeroName);
+        paymentPage.fillCVVField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveErrorNotification();
+        assertNull(SQLRequests.getStatusByCard());
+    }
+        
 }
