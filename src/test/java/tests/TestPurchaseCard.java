@@ -99,5 +99,18 @@ public class TestPurchaseCard {
         paymentPage.shouldHaveErrorNotification();
         assertNull(SQLRequests.getStatusByCard());
     }
+    @Test 
+    void shouldCheckShortCardNumber() { //проверка короткого значения по карте
+           paymentPage.openCardPaymentPage();
+        paymentPage.fillCardNumberField(zeroCard);
+        paymentPage.fillMonthField(zeroMonth);
+        paymentPage.fillYearField(zeroYear);
+        paymentPage.fillHolderField(zeroName);
+        paymentPage.fillCVVField(getRandomValidCVV());
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveErrorNotification();
+        assertNull(SQLRequests.getStatusByCard());
+    }
+        
         
 }
