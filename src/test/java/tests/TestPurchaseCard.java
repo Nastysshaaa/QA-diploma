@@ -187,7 +187,7 @@ public class TestPurchaseCard {
         paymentPage.fillMonthField(emptyMonth);
         paymentPage.fillYearField(emptyYear);
         paymentPage.fillHolderField(emptyName);
-        paymentPage.fillCvcField(emptyCVV);
+        paymentPage.fillCVVField(emptyCVV);
         paymentPage.clickContinueButton();
     }
 }
