@@ -40,7 +40,7 @@ public class TestPurchaseCard {
     }
 
     @Test
-    void shouldCheckValidApprovedByCard() {
+    void shouldCheckValidApprovedByCard() { //проверка одобренной карты 
         paymentPage.openCardPaymentPage();
         paymentPage.fillCardNumberField(approvedCardNumber);
         paymentPage.fillMonthField(DataHelper.getMonth());
