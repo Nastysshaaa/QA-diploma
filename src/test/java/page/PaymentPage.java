@@ -16,7 +16,7 @@ public class PaymentPage {
     private final SelenideElement monthField = $("[placeholder=\"08\"]");
     private final SelenideElement yearField = $("[placeholder=\"22\"]");
     private final SelenideElement holderField = $(byText("Владелец")).parent().$(".input__control");
-    private final SelenideElement cvcField = $("[placeholder=\"999\"]");
+    private final SelenideElement cvvField = $("[placeholder=\"999\"]");
     private final SelenideElement continueButton = $(withText("Продолжить"));
 
     private final SelenideElement notification = $("div.notification__visible  div.notification__content");
@@ -46,8 +46,7 @@ public class PaymentPage {
         holderField.setValue(holder);
     }
 
-    public void fillCvcField(String cvc) {
-        cvcField.setValue(cvc);
+    public void fillCvvField(String cvv) {cvvField.setValue(cvv);
     }
 
     public void clickContinueButton() {

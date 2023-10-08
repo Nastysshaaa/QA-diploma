@@ -9,7 +9,7 @@ import java.util.Locale;
 public class DataHelper {
 
     public static String approvedCardNumber = "4444 4444 4444 4441";
-    public static String declineCardNumber = "4444 4444 4444 4442";
+    public static String declinedCardNumber = "4444 4444 4444 4442";
     public static String randomCardNumber = "4444 4444 4444 1234";
     public static String emptyCardNumber = " ";
     public static String zeroCardNumber = "0000 0000 0000 0000";
@@ -24,8 +24,8 @@ public class DataHelper {
     public static String invalidHolder = "Алекс Александров";
     public static String emptyName = " ";
     public static String zeroName = "000000000";
-    public static String invalidCVV = "1ss";
-    public static String emptyCVV = " ";
+    public static String invalidCvv = "1ss";
+    public static String emptyCvv = " ";
 
     public static String getRandomCard() {
         Faker faker = new Faker();
@@ -47,7 +47,7 @@ public class DataHelper {
         return name + " " + surname;
     }
 
-    public static String getRandomValidCVV() {
+    public static String getRandomValidCvv() {
         Faker faker = new Faker();
         return faker.number().digits(3);
     }
