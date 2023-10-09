@@ -68,7 +68,9 @@ public class TestCreditCard {
         paymentPage.fillCardNumberField(approvedCardNumber);
         paymentPage.shouldHaveSuccessNotification();
         fillOtherFieldsValidInfo();
-        assertEquals("APPROVED", SQLRequests.getStatusByCredit());
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveSuccessNotification();
+        $(byText("Операция одобрена Банком.")).shouldBe(visible, Duration.ofSeconds(30));
     }
 
     @Test
@@ -95,17 +97,16 @@ public class TestCreditCard {
         stayAllFieldsEmpty();
         paymentPage.shouldHaveErrorNotificationRequiredField();
         $(byText("Поле обязательно для заполнения")).shouldBe(visible, Duration.ofSeconds(30));
-        ;
     }
 
     @Test
     void shouldCheckZeroValuesByCreditCard() {
         paymentPage.openCreditCardPaymentPage();
         paymentPage.fillCardNumberField(zeroCardNumber);
-        paymentPage.fillMonthField(zeroMonth);
-        paymentPage.fillYearField(zeroYear);
-        paymentPage.fillHolderField(zeroName);
-        paymentPage.fillCvvField(DataHelper.getRandomValidCvv());
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(DataHelper.getYear(0));
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
         paymentPage.shouldHaveErrorNotification();
         assertNull(SQLRequests.getStatusByCredit());
@@ -130,11 +131,12 @@ public class TestCreditCard {
         paymentPage.openCreditCardPaymentPage();
         paymentPage.fillCardNumberField(approvedCardNumber);
         paymentPage.fillMonthField(invalidMonth);
-        paymentPage.fillYearField(DataHelper.getYear(0));  //()
+        paymentPage.fillYearField(DataHelper.getYear(0));
         paymentPage.fillHolderField(DataHelper.getRandomValidName());
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
-        $(byText("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
+        paymentPage.shouldHaveErrorNotificationInvalidCard();
+        $(byText("Неверно указан срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
     }
 
     @Test

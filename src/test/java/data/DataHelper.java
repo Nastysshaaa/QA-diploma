@@ -15,9 +15,10 @@ public class DataHelper {
     public static String zeroCardNumber = "0000 0000 0000 0000";
     public static String shortCardNumber = "4444";
     public static String invalidMonth = "95";
+    public static String falseMonth = "1";
     public static String zeroMonth = "00";
     public static String emptyMonth = " ";
-    public static String invalidYear = "2O";
+    public static String invalidYear = "2";
     public static String lastYear = "21";
     public static String emptyYear = "";
     public static String zeroYear = "00";
