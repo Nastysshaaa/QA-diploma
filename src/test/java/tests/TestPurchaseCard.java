@@ -39,6 +39,7 @@ public class TestPurchaseCard {
         open("http://localhost:8080");
         paymentPage = new PaymentPage();
     }
+
     @AfterEach
     public void cleanTables() {
         clearTables();
@@ -57,6 +58,7 @@ public class TestPurchaseCard {
 
         assertEquals("APPROVED", SQLRequests.getStatusByCard());
     }
+
     @Test
     void shouldCheckValidDeclinedByCard() { //проверка отклненной карты
         paymentPage.openCardPaymentPage();
@@ -75,7 +77,8 @@ public class TestPurchaseCard {
     void shouldCheckEmptyByCard() {  //проверка пустого поля карты
         paymentPage.openCardPaymentPage();
         stayAllFieldsEmpty();
-        $(byText ("Поле обязательно для заполнения")).shouldBe(visible, Duration.ofSeconds(30));
+        paymentPage.shouldHaveErrorNotificationRequiredField();
+        $(byText("Поле обязательно для заполнения")).shouldBe(visible, Duration.ofSeconds(30));
     }
 
     @Test
@@ -92,6 +95,7 @@ public class TestPurchaseCard {
 
         assertNull(SQLRequests.getStatusByCard());
     }
+
     @Test
     void shouldCheckZeroValuesByCard() { //проверка нулевых значений по карте
         paymentPage.openCardPaymentPage();
@@ -104,6 +108,7 @@ public class TestPurchaseCard {
         paymentPage.shouldHaveErrorNotification();
         assertNull(SQLRequests.getStatusByCard());
     }
+
     @Test
     void shouldCheckShortCardNumber() { //проверка короткого значения по карте
         paymentPage.openCardPaymentPage();
@@ -122,12 +127,13 @@ public class TestPurchaseCard {
         paymentPage.openCardPaymentPage();
         paymentPage.fillCardNumberField(approvedCardNumber);
         paymentPage.fillMonthField(invalidMonth);
-        paymentPage.fillYearField(DataHelper.getYear(24));  //()
+        paymentPage.fillYearField(DataHelper.getYear(0));  //()
         paymentPage.fillHolderField(DataHelper.getRandomValidName());
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
-        $(byText ("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
+        $(byText("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
     }
+
     @Test
     void shouldCheckInvalidYearCard() { //проверка неверного значения по году действия карты
         paymentPage.openCardPaymentPage();
@@ -137,8 +143,10 @@ public class TestPurchaseCard {
         paymentPage.fillHolderField(DataHelper.getRandomValidName());
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
-        $(byText ("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
+        paymentPage.shouldHaveErrorNotificationWrongFormat();
+        $(byText("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
     }
+
     @Test
     void shouldCheckLastYearByCard() {  //проверка срока действия карты, прошлого года
         paymentPage.openCardPaymentPage();
@@ -148,9 +156,11 @@ public class TestPurchaseCard {
         paymentPage.fillHolderField(DataHelper.getRandomValidName());
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
-        $(byText ("Истёк срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
+        paymentPage.shouldHaveErrorNotificationCardExpired();
+        $(byText("Истёк срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
 
     }
+
     @Test
     void shouldCheckFalseMonthCard() {  //проверка  неверно заполненного поля "месяц"
         paymentPage.openCardPaymentPage();
@@ -160,8 +170,10 @@ public class TestPurchaseCard {
         paymentPage.fillHolderField(DataHelper.getRandomValidName());
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
-        $(byText ("Неверно указан срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
+        paymentPage.shouldHaveErrorNotificationInvalidCard();
+        $(byText("Неверно указан срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
     }
+
     @Test
     void shouldCheckInvalidHolderCard() {  //проверка неверно заполненного поля "владелец"
         paymentPage.openCardPaymentPage();
@@ -174,6 +186,7 @@ public class TestPurchaseCard {
         paymentPage.shouldHaveErrorNotificationWrongFormat();
         assertNull(SQLRequests.getStatusByCard());
     }
+
     @Test
     void shouldCheckInvalidCvsByCard() { //проверка неверно заполненного поля "cvv"
         paymentPage.openCardPaymentPage();
