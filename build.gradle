@@ -25,7 +25,7 @@ allure {
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-    testImplementation 'com.codeborne:selenide:5.19.0'
+    testImplementation 'com.codeborne:selenide:6.19.0'
     testImplementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation 'org.postgresql:postgresql:42.6.0'
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
