@@ -25,19 +25,24 @@ public class PaymentPage {
     private final SelenideElement cardExpired = $(withText("Истёк срок действия карты"));
     private final SelenideElement requiredField = $(withText("Поле обязательно для заполнения"));
     private final SelenideElement subField = $("input__sub");
-    public void openCardPaymentPage(){
+
+    public void openCardPaymentPage() {
         buyButton.click();
     }
-    public void openCreditCardPaymentPage(){
+
+    public void openCreditCardPaymentPage() {
         buyByCredit.click();
     }
-    public void fillCardNumberField(String cardNumber){
+
+    public void fillCardNumberField(String cardNumber) {
         cardNumberField.setValue(cardNumber);
 
     }
-    public void fillMonthField(String month){
+
+    public void fillMonthField(String month) {
         monthField.setValue(month);
     }
+
     public void fillYearField(String year) {
         yearField.setValue(year);
     }
@@ -46,7 +51,8 @@ public class PaymentPage {
         holderField.setValue(holder);
     }
 
-    public void fillCvvField(String cvv) {cvvField.setValue(cvv);
+    public void fillCvvField(String cvv) {
+        cvvField.setValue(cvv);
     }
 
     public void clickContinueButton() {
