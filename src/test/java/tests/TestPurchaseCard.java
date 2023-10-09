@@ -5,6 +5,8 @@ import data.DataHelper;
 import data.SQLRequests;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import page.PaymentPage;
 
 import java.time.Duration;
