@@ -137,6 +137,18 @@ public class TestCreditCard {
         $(byText("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
     }
 
+    @Test
+    void shouldCheckInvalidYearCard() { //проверка неверного значения по году действия карты
+        paymentPage.openCreditCardPaymentPage();
+        paymentPage.fillCardNumberField(approvedCardNumber);
+        paymentPage.fillMonthField(DataHelper.getMonth());
+        paymentPage.fillYearField(invalidYear);
+        paymentPage.fillHolderField(DataHelper.getRandomValidName());
+        paymentPage.fillCvvField(getRandomValidCvv());
+        paymentPage.clickContinueButton();
+        paymentPage.shouldHaveErrorNotificationWrongFormat();
+        $(byText("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
+    }
 
     @Test
     void shouldCheckInvalidHolderByCreditCard() {
