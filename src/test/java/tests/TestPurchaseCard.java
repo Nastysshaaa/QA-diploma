@@ -55,8 +55,8 @@ public class TestPurchaseCard {
 
         assertEquals("APPROVED", SQLRequests.getStatusByCard());
     }
-    @Test 
-    void shouldCheckValidDeclinedByCard() { //проверка отклненной карты 
+    @Test
+    void shouldCheckValidDeclinedByCard() { //проверка отклненной карты
         paymentPage.openCardPaymentPage();
         paymentPage.fillCardNumberField(declinedCardNumber);
         paymentPage.fillMonthField(DataHelper.getMonth());
@@ -68,14 +68,14 @@ public class TestPurchaseCard {
 
         assertEquals("DECLINED", SQLRequests.getStatusByCard());
     }
-   
+
     @Test
     void shouldCheckEmptyByCard() {  //проверка пустого поля карты
         paymentPage.openCardPaymentPage();
         stayAllFieldsEmpty();
         $(byText ("Поле обязательно для заполнения")).shouldBe(visible, Duration.ofSeconds(30));
     }
-    
+
     @Test
     void shouldCheckInvalidByCard() {  //проверка неверной карты
         paymentPage.openCardPaymentPage();
@@ -102,9 +102,9 @@ public class TestPurchaseCard {
         paymentPage.shouldHaveErrorNotification();
         assertNull(SQLRequests.getStatusByCard());
     }
-    @Test 
+    @Test
     void shouldCheckShortCardNumber() { //проверка короткого значения по карте
-           paymentPage.openCardPaymentPage();
+        paymentPage.openCardPaymentPage();
         paymentPage.fillCardNumberField(zeroCardNumber);
         paymentPage.fillMonthField(zeroMonth);
         paymentPage.fillYearField(zeroYear);
@@ -114,7 +114,7 @@ public class TestPurchaseCard {
         paymentPage.shouldHaveErrorNotification();
         assertNull(SQLRequests.getStatusByCard());
     }
-         
+
     @Test
     void shouldCheckInvalidMonthCard() { //проверка неверного значения по месяцу карты
         paymentPage.openCardPaymentPage();
@@ -137,8 +137,8 @@ public class TestPurchaseCard {
         paymentPage.clickContinueButton();
         $(byText ("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
     }
-       @Test
-    void shouldCheckPastYearByCard() {  //проверка срока действия карты, прошлого года
+    @Test
+    void shouldCheckLastYearByCard() {  //проверка срока действия карты, прошлого года
         paymentPage.openCardPaymentPage();
         paymentPage.fillCardNumberField(approvedCardNumber);
         paymentPage.fillMonthField(DataHelper.getMonth());
@@ -149,7 +149,7 @@ public class TestPurchaseCard {
         $(byText ("Истёк срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
 
     }
-        @Test
+    @Test
     void shouldCheckFalseMonthCard() {  //проверка  неверно заполненного поля "месяц"
         paymentPage.openCardPaymentPage();
         paymentPage.fillCardNumberField(approvedCardNumber);
@@ -160,7 +160,7 @@ public class TestPurchaseCard {
         paymentPage.clickContinueButton();
         $(byText ("Неверно указан срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
     }
-     @Test
+    @Test
     void shouldCheckInvalidHolderCard() {  //проверка неверно заполненного поля "владелец"
         paymentPage.openCardPaymentPage();
         paymentPage.fillCardNumberField(approvedCardNumber);
