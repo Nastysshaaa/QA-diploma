@@ -55,7 +55,7 @@ public class TestPurchaseCard {
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
         paymentPage.shouldHaveSuccessNotification();
-        $(byText("Операция одобрена Банком.")).shouldBe(visible, Duration.ofSeconds(30));
+        assertEquals("APPROVED", SQLRequests.getStatusByCard());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class TestPurchaseCard {
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
         paymentPage.shouldHaveErrorNotification();
-        $(byText("Ошибка! Банк отказал в проведении операции")).shouldBe(visible, Duration.ofSeconds(30));
+        assertEquals("DECLINED", SQLRequests.getStatusByCard());
     }
 
     @Test
