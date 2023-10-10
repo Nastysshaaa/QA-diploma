@@ -129,7 +129,6 @@ public class TestPurchaseCard {
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
         paymentPage.shouldHaveErrorNotificationInvalidCard();
-        $(byText("Неверно указан срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
     }
 
     @Test
@@ -142,7 +141,7 @@ public class TestPurchaseCard {
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
         paymentPage.shouldHaveErrorNotificationWrongFormat();
-        $(byText("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
+
     }
 
     @Test
@@ -155,7 +154,6 @@ public class TestPurchaseCard {
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
         paymentPage.shouldHaveErrorNotificationCardExpired();
-        $(byText("Истёк срок действия карты")).shouldBe(visible, Duration.ofSeconds(30));
 
     }
 
@@ -169,8 +167,7 @@ public class TestPurchaseCard {
         paymentPage.fillCvvField(getRandomValidCvv());
         paymentPage.clickContinueButton();
         paymentPage.shouldHaveErrorNotificationWrongFormat();
-        $(byText("Неверный формат")).shouldBe(visible, Duration.ofSeconds(30));
-    }
+           }
 
     @Test
     void shouldCheckInvalidHolderCard() {  //проверка неверно заполненного поля "владелец"
