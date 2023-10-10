@@ -4,83 +4,68 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 
 import java.time.Duration;
+import java.util.List;
 
+import static com.codeborne.selenide.Condition.exactText;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.*;
 
 public class PaymentPage {
-    private final SelenideElement buyButton = $(withText("Купить"));
-    private final SelenideElement buyByCredit = $(withText("Купить в кредит"));
-    private final SelenideElement cardNumberField = $("[placeholder=\"0000 0000 0000 0000\"]");
-    private final SelenideElement monthField = $("[placeholder=\"08\"]");
-    private final SelenideElement yearField = $("[placeholder=\"22\"]");
-    private final SelenideElement holderField = $(byText("Владелец")).parent().$(".input__control");
-    private final SelenideElement cvvField = $("[placeholder=\"999\"]");
-    private final SelenideElement continueButton = $(withText("Продолжить"));
-
-    private final SelenideElement notification = $("div.notification__visible  div.notification__content");
-    private final SelenideElement wrongFormat = $(withText("Неверный формат"));
-    private final SelenideElement invalidCard = $(withText("Неверно указан срок действия карты"));
-    private final SelenideElement cardExpired = $(withText("Истёк срок действия карты"));
-    private final SelenideElement requiredField = $(withText("Поле обязательно для заполнения"));
-    private final SelenideElement subField = $("input__sub");
-
-    public void openCardPaymentPage() {
-        buyButton.click();
+    static List<SelenideElement> input = $$(".input__control");
+    static SelenideElement cardNumber = input.get(0);
+    static SelenideElement month = input.get(1);
+    static SelenideElement year = input.get(2);
+    static SelenideElement cardOwner = input.get(3);
+    static SelenideElement cvv = input.get(4);
+    public static void payCard() {
+        open("http://localhost:8080");
+        $$(".button__content").find(exactText("Купить")).click();
+        $$(".heading_theme_alfa-on-white").find(exactText("Оплата по карте")).shouldBe(visible);
     }
 
-    public void openCreditCardPaymentPage() {
-        buyByCredit.click();
+    public static void buyCredit() {
+        open("http://localhost:8080");
+        $$(".button__content").find(exactText("Купить в кредит")).click();
+        $$(".heading_theme_alfa-on-white").find(exactText("Кредит по данным карты")).shouldBe(visible);
     }
 
-    public void fillCardNumberField(String cardNumber) {
-        cardNumberField.setValue(cardNumber);
-
+    public static void success() {
+        $$(".notification__title").find(exactText("Успешно")).shouldHave(visible, Duration.ofSeconds(15));
     }
 
-    public void fillMonthField(String month) {
-        monthField.setValue(month);
+    public static void error() {
+        $$(".notification__title").find(exactText("Ошибка")).shouldHave(visible, Duration.ofSeconds(15));
     }
 
-    public void fillYearField(String year) {
-        yearField.setValue(year);
+    public static void invalidFormat() {
+        $$(".input__sub").find(exactText("Неверный формат")).shouldBe(visible);
     }
 
-    public void fillHolderField(String holder) {
-        holderField.setValue(holder);
+    public static void invalidDate() {
+        $$(".input__sub").find(exactText("Неверно указан срок действия карты")).shouldBe(visible);
     }
 
-    public void fillCvvField(String cvv) {
-        cvvField.setValue(cvv);
+    public static void expiredCard() {
+        $$(".input__sub").find(exactText("Истёк срок действия карты")).shouldBe(visible);
     }
 
-    public void clickContinueButton() {
-        continueButton.click();
+    public static void required() {
+        $$(".input__sub").find(exactText("Поле обязательно для заполнения")).shouldBe(visible);
     }
 
-    public void shouldHaveSuccessNotification() {
-        notification.shouldHave(Condition.text("Операция одобрена Банком."), Duration.ofSeconds(15));
+
+    public static void Card(String number, String cardMonth, String cardYear, String owner, String CVV) {
+        cardNumber.setValue(number);
+        month.setValue(cardMonth);
+        year.setValue(cardYear);
+        cardOwner.setValue(owner);
+        cvv.setValue(CVV);
     }
 
-    public void shouldHaveErrorNotification() {
-        notification.shouldHave(Condition.text("Ошибка! Банк отказал в проведении операции"), Duration.ofSeconds(15));
-    }
-
-    public void shouldHaveErrorNotificationWrongFormat() {
-        wrongFormat.shouldHave(Condition.text("Неверный формат"));
-    }
-
-    public void shouldHaveErrorNotificationInvalidCard() {
-        invalidCard.shouldHave(Condition.text("Неверно указан срок действия карты"));
-    }
-
-    public void shouldHaveErrorNotificationCardExpired() {
-        cardExpired.shouldHave(Condition.text("Истёк срок действия карты"));
-    }
-
-    public void shouldHaveErrorNotificationRequiredField() {
-        requiredField.shouldHave(Condition.text("Поле обязательно для заполнения"));
+    public static void buttonContinue() {
+        $$(".button__content").find(exactText("Продолжить")).click();
     }
 
 }

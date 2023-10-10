@@ -1,39 +1,38 @@
 package data;
 
-import lombok.SneakyThrows;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class SQLRequests {
-    private static QueryRunner runner = new QueryRunner();
+    private SQLRequests() {
+    }
+    public static String url = System.getProperty("dbUrl");
+    public static String user = System.getProperty("dbUser");
+    public static String password = System.getProperty("dbPassword");
 
-    @SneakyThrows
-    public static Connection getConnection() {
-        return DriverManager.getConnection(System.getProperty("db.url"), System.getProperty("db.user"), System.getProperty("db.pass"));
+
+    public static String checkPaymentStatus() throws SQLException {
+       QueryRunner queryRunner = new QueryRunner();
+        Connection connect = DriverManager.getConnection(url, user, password);
+        String status = "SELECT status FROM payment_entity";
+        return queryRunner.query(connect, status, new ScalarHandler<String>());
     }
 
-    @SneakyThrows
-    public static void clearTables() {
-        String clearOrderTableQuery = "DELETE FROM order_entity;";
-        String clearPaymentTableQuery = "DELETE FROM payment_entity;";
-        String clearCreditRequestTableQuery = "DELETE FROM credit_request_entity;";
-        runner.update(getConnection(), clearOrderTableQuery);
-        runner.update(getConnection(), clearPaymentTableQuery);
-        runner.update(getConnection(), clearCreditRequestTableQuery);
+    public static String checkCreditStatus() throws SQLException {
+        QueryRunner queryRunner = new QueryRunner();
+        Connection connect = DriverManager.getConnection(url, user, password);
+        String status = "SELECT status FROM credit_request_entity";
+        return queryRunner.query(connect, status, new ScalarHandler<String>());
     }
 
-    @SneakyThrows
-    public static String getStatusByCard() {
-        String status = "SELECT status FROM payment_entity ORDER BY created DESC";
-        return runner.query(getConnection(), status, new ScalarHandler<>());
-    }
-
-    @SneakyThrows
-    public static String getStatusByCredit() {
-        String status = "SELECT status FROM credit_request_entity ORDER BY created DESC";
-        return runner.query(getConnection(), status, new ScalarHandler<>());
+    public static void clear() throws SQLException {
+        QueryRunner queryRunner = new QueryRunner();
+        Connection connect = DriverManager.getConnection(url, user, password);
+        queryRunner.update(connect, "DELETE FROM credit_request_entity");
+        queryRunner.update(connect, "DELETE FROM payment_entity");
     }
 }

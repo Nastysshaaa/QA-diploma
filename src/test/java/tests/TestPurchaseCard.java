@@ -5,24 +5,20 @@ import data.DataHelper;
 import data.SQLRequests;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import page.PaymentPage;
 
-import java.time.Duration;
+import java.sql.SQLException;
 
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
-import static data.DataHelper.*;
-import static data.SQLRequests.clearTables;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class TestPurchaseCard {
     private PaymentPage paymentPage;
+
+    @BeforeEach
+    void setUp() {
+        paymentPage = new PaymentPage();
+    }
 
     @BeforeAll
     static void setUpAll() {
@@ -34,173 +30,247 @@ public class TestPurchaseCard {
         SelenideLogger.removeListener("allure");
     }
 
-    @BeforeEach
-    void setUp() {
-        open("http://localhost:8080");
-        paymentPage = new PaymentPage();
-    }
-
-    @AfterEach
-    public void cleanTables() {
-        clearTables();
+    static void sqlClean() throws SQLException {
+        SQLRequests.clear();
     }
 
     @Test
-    void shouldCheckValidApprovedByCard() { //проверка одобренной карты 
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(approvedCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveSuccessNotification();
-        assertEquals("APPROVED", SQLRequests.getStatusByCard());
+    @DisplayName("Покупка активной картой")
+    public void successfulPayApprovedCardPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.thisMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.success();
+    }
+
+
+    @Test
+    @DisplayName("Покупка  с заблокированной картой")
+    public void unsuccessfulPayDeclinedCardPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.declinedCardNumber(), DataHelper.thisMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.error();
+    }
+
+
+    @Test
+    @DisplayName("Покупка тура со случайной карты")
+    public void randomCardPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.randomCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.error();
+    }
+
+
+    @Test
+    @DisplayName("Заполнение поле \"Номер карты\" одной цифрой")
+    public void oneNumberCard() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.randomDigit(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
     }
 
     @Test
-    void shouldCheckValidDeclinedByCard() { //проверка отклоненной карты
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(declinedCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotification();
-        assertEquals("DECLINED", SQLRequests.getStatusByCard());
+    @DisplayName("Заполнение поле \"Номер карты\" пятнадцатью цифрами")
+    public void shortNumberPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.shortCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
     }
 
     @Test
-    void shouldCheckEmptyByCard() {  //проверка пустого поля карты
-        paymentPage.openCardPaymentPage();
-        stayAllFieldsEmpty();
-        paymentPage.shouldHaveErrorNotificationRequiredField();
-        $(byText("Поле обязательно для заполнения")).shouldBe(visible, Duration.ofSeconds(30));
+    @DisplayName("Заполнение поле \"Номер карты\" семнадцатью цифрами")
+    public void longNumberPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.longCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
+    }
+
+
+    @Test
+    @DisplayName("Пустой номер карты")
+    public void emptyNumberCard() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.emptySymbol(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
     }
 
     @Test
-    void shouldCheckInvalidByCard() {  //проверка неверной карты
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(getRandomCard());
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotification();
-
-        assertNull(SQLRequests.getStatusByCard());
+    @DisplayName("Поле \"Месяц\" заполнено значением предыдущего месяца этого года")
+    public void lastMonth() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.lastMonth(), DataHelper.thisYear(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidDate();
     }
 
     @Test
-    void shouldCheckZeroValuesByCard() { //проверка нулевых значений по номеру карты и cvv
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(zeroCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotification();
-        assertNull(SQLRequests.getStatusByCard());
+    @DisplayName("Поле \"Месяц\" заполнено \"00\"")
+    public void zeroMonth() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.zeroMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
+    }
+
+
+    @Test
+    @DisplayName("Поле \"Месяц\" заполнено \"13\"")
+    public void thirteenMonth() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.thirteenMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidDate();
     }
 
     @Test
-    void shouldCheckShortCardNumber() { //проверка короткого значения по карте
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(shortCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotificationWrongFormat();
-        assertNull(SQLRequests.getStatusByCard());
+    @DisplayName("Поле \"Месяц\" заполнено одной цифрой")
+    public void oneNumberMonth() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.randomDigit(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
     }
 
     @Test
-    void shouldCheckInvalidMonthCard() { //проверка неверного значения по месяцу карты
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(approvedCardNumber);
-        paymentPage.fillMonthField(invalidMonth);
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotificationInvalidCard();
+    @DisplayName("Поле \"Месяц\" пустое")
+    public void emptyMonthPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.emptySymbol(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
     }
 
     @Test
-    void shouldCheckInvalidYearCard() { //проверка неверного значения по году действия карты
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(approvedCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(invalidYear);
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotificationWrongFormat();
+    @DisplayName("Поле \"Год\" заполнено \"00\"")
+    public void shouldErrorZeroYearPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.zeroMonth(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.expiredCard();
+    }
 
+
+    @Test
+    @DisplayName("Указан прошлый год")
+    public void lastYearPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.pastYear(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.expiredCard();
     }
 
     @Test
-    void shouldCheckLastYearByCard() {  //проверка срока действия карты, прошлого года
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(approvedCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(lastYear);
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotificationCardExpired();
+    @DisplayName("Указан срок действия больше 5 лет")
+    public void moreSixYearPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.moreFiveYear(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidDate();
+    }
 
+
+    @Test
+    @DisplayName("Один цифра в поле \"Год\"")
+    public void oneDigitYearPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.randomDigit(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
+    }
+
+
+    @Test
+    @DisplayName("Пустое поле  \"Год\"")
+    public void emptyYearPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.emptySymbol(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
     }
 
     @Test
-    void shouldCheckFalseMonthCard() {  //проверка  неверно заполненного поля "месяц"
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(approvedCardNumber);
-        paymentPage.fillMonthField(falseMonth);
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotificationWrongFormat();
-           }
+    @DisplayName("Заполнено только имя в поле \"Владелец карты\"")
+    public void onlyNamePay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.onlyNameCardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
+    }
+
 
     @Test
-    void shouldCheckInvalidHolderCard() {  //проверка неверно заполненного поля "владелец"
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(approvedCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(invalidHolder);
-        paymentPage.fillCvvField(getRandomValidCvv());
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotificationWrongFormat();
-        assertNull(SQLRequests.getStatusByCard());
+    @DisplayName("Заполнено поле \"Владелец карты\" некорректными данными")
+    public void negativeCardHolderPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.negativeCardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.error();
+    }
+
+
+    @Test
+    @DisplayName("Заполнено поле \"Владелец карты\" цифрами")
+    public void numberCardHolderPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.numbersCardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        PaymentPage.error();
+    }
+
+
+    @Test
+    @DisplayName("Буквы в поле \"CVV\"")
+    public void letterCvvPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.lettersOnCVV());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
+    }
+
+
+    @Test
+    @DisplayName("Спецсимволы в поле \"CVV\"")
+    public void symbolsCvvPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.symbolCVV());
+        PaymentPage.buttonContinue();
+        PaymentPage.invalidFormat();
     }
 
     @Test
-    void shouldCheckInvalidCvvByCard() { //проверка неверно заполненного поля "cvv"
-        paymentPage.openCardPaymentPage();
-        paymentPage.fillCardNumberField(approvedCardNumber);
-        paymentPage.fillMonthField(DataHelper.getMonth());
-        paymentPage.fillYearField(DataHelper.getYear(0));
-        paymentPage.fillHolderField(DataHelper.getRandomValidName());
-        paymentPage.fillCvvField(invalidCvv);
-        paymentPage.clickContinueButton();
-        paymentPage.shouldHaveErrorNotificationWrongFormat();
-        assertNull(SQLRequests.getStatusByCard());
+    @DisplayName("Пусто в поле \"CVV\"")
+    public void emptyCvvPay() {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.emptySymbol());
+        PaymentPage.buttonContinue();
+        PaymentPage.required();
     }
 
-    private void stayAllFieldsEmpty() {  //оставить все поля пустыми
-        paymentPage.fillCardNumberField(emptyCardNumber);
-        paymentPage.fillMonthField(emptyMonth);
-        paymentPage.fillYearField(emptyYear);
-        paymentPage.fillHolderField(emptyName);
-        paymentPage.fillCvvField(emptyCvv);
-        paymentPage.clickContinueButton();
+    @Test
+    @DisplayName("Покупка с активной карты, регистрация записи в БД")
+    void successfulPayApprovedCardPayWithDBCheck() throws SQLException, InterruptedException {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.thisMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        Thread.sleep(5000);
+        assertEquals("APPROVED", SQLRequests.checkPaymentStatus());
+    }
+
+
+    @Test
+    @DisplayName("Покупка с заблокированной карты, регистрация записи в БД")
+    void unsuccessfulPayDeclinedCardPayWithDBCheck() throws SQLException, InterruptedException {
+        PaymentPage.payCard();
+        PaymentPage.Card(DataHelper.declinedCardNumber(), DataHelper.thisMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.buttonContinue();
+        Thread.sleep(5000);
+        assertEquals("DECLINED", SQLRequests.checkPaymentStatus());
     }
 }
