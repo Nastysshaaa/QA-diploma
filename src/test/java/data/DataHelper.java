@@ -14,7 +14,7 @@ public class DataHelper {
     static String [] declinedCardNumber = {"4444 4444 4444 4442"};
     static String [] name = {"Ivan","Nastiia","Alex", "Kate", "Anna"};
     static String [] surname = {"Ivanov","Vasileva","Ionov", "Avvvvvvv", "Yagodina"};
-    static String [] invalidName = {"Антон", "12345"};
+    static String [] invalidName = {"Антон", "!@#$"};
     static String [] invalidSurname = {"Антонов", "12345"};
 
     static String [] randomCardNumber = {

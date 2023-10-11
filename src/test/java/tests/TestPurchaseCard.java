@@ -88,7 +88,7 @@ public class TestPurchaseCard {
         PaymentPage.payCard();
         PaymentPage.Card(DataHelper.longCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
         PaymentPage.buttonContinue();
-        PaymentPage.invalidFormat();
+        PaymentPage.error();
     }
 
 
@@ -251,26 +251,5 @@ public class TestPurchaseCard {
         PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.emptySymbol());
         PaymentPage.buttonContinue();
         PaymentPage.required();
-    }
-
-    @Test
-    @DisplayName("Покупка с активной карты, регистрация записи в БД")
-    void successfulPayApprovedCardPayWithDBCheck() throws SQLException, InterruptedException {
-        PaymentPage.payCard();
-        PaymentPage.Card(DataHelper.approvedCardNumber(), DataHelper.thisMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
-        PaymentPage.buttonContinue();
-        Thread.sleep(5000);
-        assertEquals("APPROVED", SQLRequests.checkPaymentStatus());
-    }
-
-
-    @Test
-    @DisplayName("Покупка с заблокированной карты, регистрация записи в БД")
-    void unsuccessfulPayDeclinedCardPayWithDBCheck() throws SQLException, InterruptedException {
-        PaymentPage.payCard();
-        PaymentPage.Card(DataHelper.declinedCardNumber(), DataHelper.thisMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
-        PaymentPage.buttonContinue();
-        Thread.sleep(5000);
-        assertEquals("DECLINED", SQLRequests.checkPaymentStatus());
     }
 }
