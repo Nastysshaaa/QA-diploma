@@ -6,8 +6,8 @@
 Интегрирован Allure для вывода детализированных отчетов.  
 
 Написаны 46 теств:
-- 11 тестов провалены (23,92%)
-- 35 тестов успешно пройдены (76,08%)
+- 10 тестов провалены (21,74%)
+- 36 тестов успешно пройдены (78,26%)
 
 ### Обнаруженные баги
 По результатам автотестов составлено 7 баг-репортов.
@@ -17,10 +17,10 @@
 
 #### Более подробно результаты проведения автоматизированного тестирования можно посмотреть по отчету Allure:
 
-![allure sql](https://github.com/Nastysshaaa/QA-diploma/assets/123237244/9eb62c0f-1acd-4895-9c73-1b1a4592ba5e)
-![allure sql 3](https://github.com/Nastysshaaa/QA-diploma/assets/123237244/70f1090b-3558-4818-b60e-50929129ba84)
-![allure sql 1](https://github.com/Nastysshaaa/QA-diploma/assets/123237244/5dd2ddb5-ecc9-460a-95ac-c4194210fd34)
-![allure sql 2](https://github.com/Nastysshaaa/QA-diploma/assets/123237244/649b3bf6-e7ff-47ae-975e-dbf352210346)
+![Снимок экрана 2023-10-14 135911](https://github.com/Nastysshaaa/QA-diploma/assets/123237244/fa0b0f24-c1e4-4980-9224-022041531126)
+![Снимок экрана 2023-10-14 135952](https://github.com/Nastysshaaa/QA-diploma/assets/123237244/c3695059-359c-4744-98a8-d6ec2edf1ba5)
+![Снимок экрана 2023-10-14 135828](https://github.com/Nastysshaaa/QA-diploma/assets/123237244/46c19a00-f1de-4e62-a59a-160e5ad0207b)
+
 
 ### Общие рекомендации
 
