@@ -56,7 +56,7 @@ public class TestCreditCard {
     @DisplayName("Покупка тура в кредит со случайной карты")
     public void randomCreditCardPay() {
         PaymentPage.buyCredit();
-        PaymentPage.Card(DataHelper.randomCardNumber(), DataHelper.month(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
+        PaymentPage.Card(DataHelper.randomCardNumber(), DataHelper.thisMonth(), DataHelper.year(), DataHelper.cardHolder(), DataHelper.cvv());
         PaymentPage.buttonContinue();
         PaymentPage.error();
     }
